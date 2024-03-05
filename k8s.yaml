@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: stride-proposal-atomfeed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stride-proposal-atomfeed
+  template:
+    metadata:
+      labels:
+        app: stride-proposal-atomfeed
+    spec:
+      containers:
+      - args:
+        image: derorisan/stride-proposal-atomfeed
+        imagePullPolicy: Always
+        name: stride-proposal-atomfeed
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        env:
+        - name: PROPS_ENDPOINT
+          value: https://stride-api.polkachu.com/cosmos/gov/v1/proposals?proposal_status=PROPOSAL_STATUS_UNSPECIFIED&pagination.limit=10&pagination.reverse=true
+        - name: LINK_BASE_URL
+          value: https://www.mintscan.io/stride/proposals/
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: stride-proposal-atomfeed
+spec:
+  ports:
+  - name: "http-port"
+    protocol: TCP
+    port: 80
+    targetPort: 4000
+  selector:
+    app: stride-proposal-atomfeed
+---

@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: stride-testnet-proposal-atomfeed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stride-testnet-proposal-atomfeed
+  template:
+    metadata:
+      labels:
+        app: stride-testnet-proposal-atomfeed
+    spec:
+      containers:
+      - args:
+        image: derorisan/stride-testnet-proposal-atomfeed
+        imagePullPolicy: Always
+        name: stride-testnet-proposal-atomfeed
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        env:
+        - name: PROPS_ENDPOINT
+          value: https://stride-testnet-api.polkachu.com/cosmos/gov/v1/proposals?proposal_status=PROPOSAL_STATUS_UNSPECIFIED&pagination.limit=10&pagination.reverse=true
+        - name: LINK_BASE_URL
+          value: https://testnet.ping.pub/stride/gov/
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: stride-testnet-proposal-atomfeed
+spec:
+  ports:
+  - name: "http-port"
+    protocol: TCP
+    port: 80
+    targetPort: 4000
+  selector:
+    app: stride-testnet-proposal-atomfeed
+---
